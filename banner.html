@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+        }
+
+        .banner-wrap {
+            white-space: nowrap;
+            position: absolute;
+            height:200px;
+            
+        }
+
+        .banner-wrap li {
+            float: left;
+            font-size: 100px;
+            text-align: center;
+            height: 100px;
+            width: 100%;
+            height: 200px;
+            list-style: none;
+        }
+
+        .banner-wrap li:nth-of-type(1) {
+            background: green;
+        }
+
+        .banner-wrap li:nth-of-type(2) {
+            background: pink;
+        }
+
+        .banner-wrap li:nth-of-type(3) {
+            background: blue;
+        }
+
+        .banner-wrap li:nth-of-type(4) {
+            background: green;
+        }
+        .wrap {
+            position: relative;
+            width:100%;
+            height:200px;
+            overflow: hidden;
+        }
+        .dot-wrap {
+            position: absolute;
+            bottom:0;
+        }
+        .dot-wrap li {
+            float:left;
+            list-style: none;
+            width:50px;
+            background: #fff;
+            margin:0 20px;
+        }
+        .dot-wrap li.active {
+            background: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <ul class="banner-wrap">
+            <li class="dot">1</li>
+            <li class="dot">2</li>
+            <li class="dot">3</li>
+            <li class="dot">1</li>
+        </ul>
+        <ul class="dot-wrap">
+            <li class="active">1</li>
+            <li>2</li>
+            <li>3</li>
+        </ul>
+    </div>
+    <script>
+        (function(){
+
+            var $dot_wrap = $(".dot-wrap"), // 广告图容器
+                $banner_wrap = $(".banner-wrap"), // 下面小点容器
+                imgLength = $dot_wrap.find("li").length, // 幻灯片个数
+                window_width,   // 屏幕的宽度
+                timer = null,   // 定时器对象
+                ul_width; // 外围容器宽度
+                
+            window.onresize = function(){
+                imgAnimate();
+            }
+
+            imgAnimate()
+
+            function imgAnimate( index ) {
+                clearInterval(timer);
+
+                window_width = $(window).width();
+                ul_width = window_width*(imgLength+1);
+                $banner_wrap.find("li").width(window_width);
+                $banner_wrap.width(ul_width);
+                
+
+                if (imgLength <= 1) {
+                    return false;
+                };
+                var index = index? index:0,
+                    LEFT = -index * window_width;
+
+                timer = setInterval(function () {
+                    LEFT -= window_width;
+                    index++;
+                    if (LEFT <= -(imgLength + 1) * window_width) {
+                        $banner_wrap.css("left", 0);
+                        LEFT = -window_width;
+                    }
+                    if (index == imgLength) {
+                        index = 0;
+                    };
+                   
+                    $banner_wrap.animate({left:LEFT+"px"},500);
+                    $dot_wrap.find("li").eq(index).addClass("active").siblings().removeClass("active");
+                }, 2000)
+            };
+
+            //小圆点点击事件
+            $dot_wrap.on('click', "li", function () {
+                clearInterval(timer);
+                var index = $(this).index();
+                $banner_wrap.css("left", -window_width * index);
+                $dot_wrap.find("li").eq(index).addClass("active").siblings().removeClass("active");
+                imgAnimate(index);
+
+            });
+
+            // 鼠标移入 阻止幻灯片播放
+            var $wrap = $(".wrap");
+            $wrap.on("mouseenter",function(){
+                clearInterval(timer);
+            })
+            $wrap.on("mouseleave",function(){
+                imgAnimate(0);
+            })
+
+        })();
+        
+    </script>
+</body>
+
+</html>
